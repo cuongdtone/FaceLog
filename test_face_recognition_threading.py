@@ -5,8 +5,7 @@ from threading import Thread
 from Face.face_threading import  *
 import time
 
-cap = cv2.VideoCapture('samples/trumpvsbinden.mp4')
-
+cap = cv2.VideoCapture(0)
 
 face_threading = face_thread(cap)
 final_frame_queue, frame_ori_queue = face_threading.run()
@@ -24,12 +23,10 @@ last_time = time.time()
 while True: 
     # print('task 1')
 
-
     data = final_frame_queue.get()
     frame_ori = frame_ori_queue.get()
 
     frame = data['frame']  # drawed frame
-
 
     fps = 1 / (time.time() - last_time)
     fpss.append(fps)
