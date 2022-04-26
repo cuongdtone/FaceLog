@@ -3,13 +3,14 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap
 import sys
 import cv2
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
 import numpy as np
+import traceback
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
+
 from Face.face_threading import face_thread
 
-import traceback
-import sys
-
+from tab1 import tab1
+from log import Log
 
 class RecognThread(QThread):
     change_screen_signal = pyqtSignal(dict)
@@ -20,7 +21,7 @@ class RecognThread(QThread):
 
     def run(self):
         # capture from web cam
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture("/dev/video1")
         thread = face_thread(cap)
         frame_final_queue, frame_ori_queue = thread.run()
 
@@ -39,8 +40,8 @@ class RecognThread(QThread):
         self.wait()
 
 
-from tab1 import tab1
-from log import Log
+
+
 class Tab1(QWidget, tab1):
     def __init__(self):
         super().__init__()
