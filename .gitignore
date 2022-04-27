@@ -1,11 +1,3 @@
 __pycache__
 .idea
-attendance.ui
-tab2.ui
-*/__pycache__
-Face/det_10g.onnx
-Face/w600k_r50.onnx
 
-test_latency_of_models.py
-test_face_recognition.py
-add_new_employe.py

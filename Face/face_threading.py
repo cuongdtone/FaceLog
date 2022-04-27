@@ -3,19 +3,25 @@ import numpy as np
 from .face import Face_Model
 from queue import Queue
 from threading import Thread
-from utils import compute_color_for_labels, get_center, center_match
+from Face.utils import compute_color_for_labels, get_center, center_match
 
+period = 2
 face_model = Face_Model()
-count = 9
-out_people = [{'Name': 'uknown', 'Sim':  -1, 'Position': 'None', "Office":  'None', 'path': 'icon/unknown_person.jpg', 'center': np.array([0, 0])}]
+count = 1
+out_people = [{'fullname': 'uknown', 'code': None, 'Sim': 0, 'center': np.array([0, 0])}]
+
+
 def read_thread(cap, frame_ori_queue, frame_detect_queue):
     while cap.isOpened():
         ret, frame = cap.read()
-        frame =  cv2.flip(frame, flipCode=1)
-        if not ret: break
+        frame = cv2.flip(frame, flipCode=1)
+        if not ret:
+            break
         frame_ori_queue.put(frame)
         frame_detect_queue.put(frame)
     cap.release()
+
+
 def detect_thread(cap, frame_detect_queue, data_recognize_queue):
     global count
     while cap.isOpened():
@@ -25,15 +31,17 @@ def detect_thread(cap, frame_detect_queue, data_recognize_queue):
         put_data = {'frame': frame, 'faces':faces, 'kpss':kpss}
         data_recognize_queue.put(put_data)
     cap.release()
+
+
 def recognize_thread(cap, data_recognize_queue, data_final_queue):
-    global count
+    global count, period
     while cap.isOpened():
         data = data_recognize_queue.get()
         frame = data['frame']
         faces = data['faces']
         kpss = data['kpss']
         people = []
-        if count >= 10:
+        if count >= period:
             count = 0
             for idx, kps in enumerate(kpss):
                 feet = face_model.face_encoding(frame, kps)
@@ -44,6 +52,8 @@ def recognize_thread(cap, data_recognize_queue, data_final_queue):
         final_data = {'faces': faces, 'people': people}
         data_final_queue.put(final_data)
     cap.release()
+
+
 def draw_thread(cap, frame_ori_queue, data_final_queue, frame_final_queue, frame_ori2_queue):
     global out_people
     while cap.isOpened():
@@ -61,17 +71,21 @@ def draw_thread(cap, frame_ori_queue, data_final_queue, frame_final_queue, frame
                 now_center = get_center(face_box)
                 i = center_match(now_center, people)
                 info = people[i]
-                color = compute_color_for_labels(sum([ord(character) for character in info['Name']]))
-                name_display = info['Name'].split()[-1] + ' - %.2f'%(info['Sim'])
+                color = compute_color_for_labels(sum([ord(character) for character in info['fullname']]))
+                name_display = info['fullname'].split()[-1] + ' - %.2f'%(info['Sim'])
                 t_size = cv2.getTextSize(name_display, fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1.0, thickness=1)[0]
                 cv2.rectangle(frame, (face_box[0], face_box[1]), (face_box[0] + t_size[0] + 10, face_box[1] + t_size[1] + 10), color, -1)
                 cv2.putText(frame, name_display, (face_box[0], face_box[1]+t_size[1]+5), cv2.FONT_HERSHEY_PLAIN,
                             fontScale=1.0, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
                 cv2.rectangle(frame, (face_box[0], face_box[1]), (face_box[2], face_box[3]), color, 2)
-            except:
+            except Exception as e:
+                print(e)
                 continue
-        frame_final_queue.put({'frame':frame, 'people': people})
-
+        out_info = []
+        for person in people:
+            info = {'fullname': person['fullname'], 'code': person['code']}
+            out_info.append(info)
+        frame_final_queue.put({'frame':frame, 'people': out_info})
     cap.release()
 
 class face_thread():
@@ -85,18 +99,17 @@ class face_thread():
         self.frame_final_queue = Queue(maxsize=2)
         self.data_output_queue = Queue(maxsize=2)
 
-
         self.read = Thread(target=read_thread, args=[self.cap, self.frame_ori_queue, self.frame_detect_queue])
         self.detect = Thread(target=detect_thread, args=[self.cap, self.frame_detect_queue, self.data_recognize_queue])
         self.recognize = Thread(target=recognize_thread, args=[self.cap, self.data_recognize_queue, self.data_final_queue])
         self.draw = Thread(target=draw_thread, args=[self.cap, self.frame_ori_queue, self.data_final_queue, self.frame_final_queue, self.frame_ori2_queue])
+
     def run(self):
         self.read.start()
         self.detect.start()
         self.recognize.start()
         self.draw.start()
         return self.frame_final_queue, self.frame_ori2_queue
-
 
 
 if __name__ == '__main__':

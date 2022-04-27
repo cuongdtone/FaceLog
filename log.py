@@ -6,7 +6,6 @@ import os
 
 class Log():
     def __init__(self, db='log'):
-
         self.db = db
     def login(self, person):
         now = datetime.now()
