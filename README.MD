@@ -1,9 +1,9 @@
-# Face Log
+# FaceLog at device
 
-## Usage
-***
-```buildoutcfg
-conda create -n my_env python=3.6
-conda activate my_env
-pip install -r requirements.txt
+## Docker run:
 ```
+docker build -t facelog . 
+docker pull cuongtran73d1/facelog
+bash start.sh
+```
+
