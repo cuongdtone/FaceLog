@@ -23,7 +23,7 @@ class Main:
         self.employees_data = []  # code_name_faceid
         self.load()
         # Front camera thread
-        self.front_camera = cv2.VideoCapture(0)
+        self.front_camera = cv2.VideoCapture(self.config['front_camera'])
         self.front_camera_thread = FaceThread(self.front_camera, self.employees_data)
         self.checkin_list = {}
         # Back camera thread
