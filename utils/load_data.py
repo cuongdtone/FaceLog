@@ -13,7 +13,7 @@ def load_user_data():
     for user in users_info:
         if user["pkl_file"] and str(user["pkl_file"]) != "" and os.path.exists(root_path + user["pkl_file"]):
             with open(root_path + user["pkl_file"], 'rb') as f:
-                info = pickle.load(f)
+                info = {'feet': pickle.load(f)}
                 info.update({'fullname': user['fullname']})
                 info.update({'code': user['code']})
                 data.append(info)

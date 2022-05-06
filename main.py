@@ -10,7 +10,7 @@ from threading import Thread
 import cv2
 import yaml
 from utils.log import checkin
-from utils.face_threading import face_thread
+from utils.face_threading import FaceThread
 from utils.load_data import load_user_data
 
 
@@ -23,14 +23,13 @@ class Main:
         self.employees_data = []  # code_name_faceid
         self.load()
         # Front camera thread
-        self.front_camera = cv2.VideoCapture('/dev/video0')
-        self.front_camera_thread = face_thread(self.front_camera, self.employees_data)
+        self.front_camera = cv2.VideoCapture(2)
+        self.front_camera_thread = FaceThread(self.front_camera, self.employees_data)
         self.checkin_list = {}
-
         # Back camera thread
-        self.back_camera = cv2.VideoCapture(2)
-        self.back_camera_thread = face_thread(self.back_camera, self.employees_data)
-        self.checkout_list = []
+        self.back_camera = cv2.VideoCapture(1)
+        self.back_camera_thread = FaceThread(self.back_camera, self.employees_data)
+        self.checkout_list = {}
         # Reload database
         reload_thread = Thread(target=self.reload_local_db)
         reload_thread.start()

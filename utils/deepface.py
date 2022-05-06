@@ -193,7 +193,7 @@ class RetinaFace:
             self.session = onnxruntime.InferenceSession(self.model_file, None, providers=ep_list)
         self.center_cache = {}
         self.nms_thresh = 0.4
-        self.det_thresh = 0.6
+        self.det_thresh = 0.55
         self._init_vars()
 
     def _init_vars(self):
@@ -317,7 +317,7 @@ class RetinaFace:
                 kpss_list.append(pos_kpss)
         return scores_list, bboxes_list, kpss_list
 
-    def detect(self, img, input_size=None, max_num=0, metric='default'):
+    def detect(self, img, input_size=(640, 640), max_num=0, metric='default'):
         assert input_size is not None or self.input_size is not None
         input_size = self.input_size if input_size is None else input_size
 

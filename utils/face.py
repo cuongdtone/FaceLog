@@ -30,9 +30,9 @@ class FaceRecog():
                 feets.append(feet)
             except:
                 continue
-        data = {'feets': feets}
+        feet = np.sum(np.array(feets), axis=0)/len(feets)
         with open(os.path.join(db_path, str(id_code) + '.pkl'), 'wb') as f:
-            pickle.dump(data, f)
+            pickle.dump(feet, f)
 
     def detect(self, img):
         return self.face_detection.detect(img, max_num=0, metric='default', input_size=(640, 640))
@@ -47,15 +47,13 @@ class FaceRecog():
         max_sim = -1
         info = {'fullname': 'uknown', 'Sim':  max_sim, 'code': None}
         for data in self.employees_data:
-            feets = data['feets']
-            for feet_compare in feets:
-                sim = self.face_recognition.compute_sim(feet, feet_compare)
-                info['Sim'] = sim
-                if sim>threshold and sim>max_sim:
-                    max_sim = sim
-                    info['fullname'] = data["fullname"]
-                    info['Sim'] = sim
-                    info['code'] = data['code']
+            feet_compare = data['feet']
+            sim = self.face_recognition.compute_sim(feet, feet_compare)
+            if sim > threshold and sim > max_sim:
+                max_sim = sim
+                info['fullname'] = data["fullname"]
+                info['Sim'] = max_sim
+                info['code'] = data['code']
         return info
 
 

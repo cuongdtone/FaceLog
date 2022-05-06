@@ -7,7 +7,7 @@ from .utils import compute_color_for_labels, get_center, center_match
 from unidecode import unidecode
 
 
-class face_thread():
+class FaceThread():
     def __init__(self, cap, employees_data):
         self.face_model = FaceRecog(employees_data)
         self.cap = cap
@@ -115,7 +115,7 @@ class face_thread():
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture('samples/binden.mp4')
-    face_recog = face_thread(cap)
+    face_recog = FaceThread(cap)
     frame_final_queue = face_recog.run()
     while True:
         timer = cv2.getTickCount()

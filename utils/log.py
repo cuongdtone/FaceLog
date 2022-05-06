@@ -22,7 +22,7 @@ def checkin(people, checkin_list, employees, frame_ori, config):
             continue
         # finished 2 case close door when face exist
         # Just checkin and return camera: checkin again
-        if not code in checkin_list_code or (now - checkin_list[f'{code}']).total_seconds() > 0.5:
+        if not code in checkin_list_code or (now - checkin_list[f'{code}']).total_seconds() > 0.7:
             print('Success') # opendoor and checkin code here
             text = unidecode(f'{code} - {employee["fullname"]} - front - {timenow}')
             cv2.putText(frame_ori, text, (20, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 2)

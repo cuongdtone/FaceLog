@@ -7,19 +7,22 @@ from utils.sqlite_database import update_pkl_employee
 import argparse
 
 id = input('ID : ')
+camera = 2
 
 # Phase 1: Select ROI and take img
-cap = cv2.VideoCapture(0)
+
 db_root = 'src/data'
 person = os.path.join(db_root, id)
 try:
     os.mkdir(person)
 except:
     pass
-ret, frame = cap.read()
-r = cv2.selectROI(frame)
+
 Cap = True
 if Cap:
+    cap = cv2.VideoCapture(camera)
+    ret, frame = cap.read()
+    r = cv2.selectROI(frame)
     while cap.isOpened():
         ret, frame = cap.read()
         cv2.rectangle(frame,
