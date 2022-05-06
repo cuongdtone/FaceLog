@@ -36,7 +36,7 @@ class FaceThread():
     def read_thread(self, cap, frame_ori_queue, frame_detect_queue):
         while cap.isOpened():
             ret, frame = cap.read()
-            frame = cv2.flip(frame, flipCode=1)
+            # frame = cv2.flip(frame, flipCode=1)
             if not ret:
                 break
             frame_ori_queue.put(frame)

@@ -27,9 +27,9 @@ class Main:
         self.front_camera_thread = FaceThread(self.front_camera, self.employees_data)
         self.checkin_list = {}
         # Back camera thread
-        self.back_camera = cv2.VideoCapture(1)
-        self.back_camera_thread = FaceThread(self.back_camera, self.employees_data)
-        self.checkout_list = {}
+        # self.back_camera = cv2.VideoCapture(0)
+        # self.back_camera_thread = FaceThread(self.back_camera, self.employees_data)
+        # self.checkout_list = {}
         # Reload database
         reload_thread = Thread(target=self.reload_local_db)
         reload_thread.start()
@@ -45,8 +45,8 @@ class Main:
 
     def run(self):
         final_data_front_queue, frame_ori_front_queue = self.front_camera_thread.run()
-        final_data_back_queue, frame_ori_back_queue = self.back_camera_thread.run()
-        while self.front_camera.isOpened() or self.back_camera.isOpened():
+        # final_data_back_queue, frame_ori_back_queue = self.back_camera_thread.run()
+        while self.front_camera.isOpened(): # or self.back_camera.isOpened():
             if self.front_camera.isOpened():
                 #front camera
                 data_front = final_data_front_queue.get()
@@ -55,12 +55,12 @@ class Main:
                 people_front = data_front['people']
                 self.checkin_list = checkin(people_front, self.checkin_list, self.employees, frame_ori_front, self.config)
                 cv2.imshow('Front Camera', frame_front)
-            if self.back_camera.isOpened():
-                data_back = final_data_back_queue.get()
-                frame_ori_back = frame_ori_back_queue.get()
-                frame_back = data_back['frame']  # drawed frame
-                people_back = data_back['people']
-                cv2.imshow('Back Camera', frame_back)
+            # if self.back_camera.isOpened():
+            #     data_back = final_data_back_queue.get()
+            #     frame_ori_back = frame_ori_back_queue.get()
+            #     frame_back = data_back['frame']  # drawed frame
+            #     people_back = data_back['people']
+            #     cv2.imshow('Back Camera', frame_back)
             cv2.waitKey(5)
 
 
