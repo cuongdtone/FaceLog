@@ -15,3 +15,5 @@ public_key_path: ./src/public.pem
 username_login: chinhanhdanang
 
 db_local: ./src/data
+front_camera: rtsp://admin:tmt123123@@172.29.7.100:554/cam/realmonitor?channel=1&subtype=0
+back_camera: 1
