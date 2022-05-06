@@ -25,7 +25,11 @@ class FaceThread():
         self.detect = Thread(target=self.detect_thread, args=[self.cap, self.face_model, self.frame_detect_queue, self.data_recognize_queue])
         self.recognize = Thread(target=self.recognize_thread, args=[self.cap, self.face_model, self.data_recognize_queue, self.data_final_queue])
         self.draw = Thread(target=self.draw_thread, args=[self.cap, self.frame_ori_queue, self.data_final_queue, self.frame_final_queue, self.frame_ori2_queue])
-
+        self.read.setDaemon(True)
+        self.detect.setDaemon(True)
+        self.recognize.setDaemon(True)
+        self.draw.setDaemon(True)
+        
     def run(self):
         self.read.start()
         self.detect.start()
