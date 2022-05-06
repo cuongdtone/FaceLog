@@ -21,18 +21,16 @@ def checkin(people, checkin_list, employees, frame_ori, config):
         if not employee['active']:  # Not active in database
             continue
         # finished 2 case close door when face exist
-        # open door
-        open_door()
-        # insert Timekeep
-        if not code in checkin_list_code or (now - checkin_list[f'{code}']).total_seconds() > config['delay_timekeep']:
-            print('Success')
+        # Just checkin and return camera: checkin again
+        if not code in checkin_list_code or (now - checkin_list[f'{code}']).total_seconds() > 0.5:
+            print('Success') # opendoor and checkin code here
             text = unidecode(f'{code} - {employee["fullname"]} - front - {timenow}')
             cv2.putText(frame_ori, text, (20, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 2)
             retval, buffer = cv2.imencode('.jpg', frame_ori)
             jpg_as_text = base64.b64encode(buffer)
             insert_timekeeping(None, code, employee["fullname"], config['device_name'], image=jpg_as_text)
-            if not code in checkin_list_code:
-                checkin_list.update({f'{code}': now})  # new track
-            else:
-                checkin_list[f'{code}'] = now  # update old track
+        if not code in checkin_list_code:
+            checkin_list.update({f'{code}': now})  # new track
+        else:
+            checkin_list[f'{code}'] = now  # update old track
     return checkin_list

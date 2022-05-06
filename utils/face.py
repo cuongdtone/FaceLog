@@ -14,24 +14,16 @@ class FaceRecog():
         self.face_detection = RetinaFace(model_file='src/det_500m.onnx')
         self.employees_data = employess_data
 
-    def create_data_file(self, db_path, name, id_code):
-        path_to_dir = os.path.join(db_path, name)
+    def create_data_file(self, db_path, id_code):
+        path_to_dir = os.path.join(db_path, id_code)
         # position = input("Position:  ")
         # office = input("Office:  ")
-        list_img = glob.glob(path_to_dir + '/*.jpg') + \
-                   glob.glob(path_to_dir + '/*.jpeg') + \
-                   glob.glob(path_to_dir + '/*.png')
+        list_img = glob.glob(os.path.join(path_to_dir, '*.jpg')) + \
+                   glob.glob(os.path.join(path_to_dir, '*.jpeg')) + \
+                   glob.glob(os.path.join(path_to_dir, '*.png'))
         feets = []
         for i in list_img:
             image = cv2.imread(i)
-            # convert all format image to jpg
-            if i.split('.')[-1] != 'jpg':
-                os.remove(i)
-                path = i.split('.')
-                path.pop()
-                cv2.imwrite('.'.join(path) + '.jpg', image)
-
-            id_img = i.split('/')[-1].split('.')[0]
             try:
                 faces, kpss = self.face_detection.detect(image, max_num=0, metric='default', input_size=(640, 640))
                 feet = self.face_encoding(image, kpss[0])
@@ -39,7 +31,7 @@ class FaceRecog():
             except:
                 continue
         data = {'feets': feets}
-        with open(db_path + '/' + str(id_code) + '.pkl', 'wb') as f:
+        with open(os.path.join(db_path, str(id_code) + '.pkl'), 'wb') as f:
             pickle.dump(data, f)
 
     def detect(self, img):

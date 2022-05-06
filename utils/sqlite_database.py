@@ -4,6 +4,7 @@ from pathlib import Path
 QUERY_INSERT_EMP = "INSERT INTO employee ( code, fullname, name, sex, branch, vocative, created_user, isadmin) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);"
 QUERY_UPDATE_EMP = "UPDATE employee SET fullname = ?, sex = ?, vocative = ?, updated_user = ?, isadmin=?, status = ?, active = ? WHERE code = ?;"
 QUERY_UPDATE_STATUS_EMP = "UPDATE employee SET status = ? WHERE code = ?;"
+QUERY_UPDATE_PKL_EMP = "UPDATE employee SET pkl_file = ? WHERE code = ?;"
 QUERY_INSERT_TKP = """INSERT INTO timekeepings ( code, fullname, device_name, source, image) VALUES (?, ? , ?, ?, ?);"""
 
 
@@ -75,6 +76,10 @@ def update_employee(db, code: str, fullname: str, sex: int, updated_user: str, i
 
 def update_status_employee(db, code: str, status=1):
     return execute(db, QUERY_UPDATE_STATUS_EMP, (status, code))
+
+
+def update_pkl_employee(db, code: str, pkl_path: str):
+    return execute(db, QUERY_UPDATE_PKL_EMP, (pkl_path, code))
 
 
 def get_all_employee(db):

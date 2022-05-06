@@ -18,7 +18,7 @@ class face_thread():
         self.data_final_queue = Queue(maxsize=2)
         self.frame_final_queue = Queue(maxsize=2)
         self.data_output_queue = Queue(maxsize=2)
-        self.period = 3
+        self.period = 1
         self.count = 1
         self.out_people = [{'fullname': 'uknown', 'code': None, 'Sim': 0, 'center': np.array([0, 0])}]
         self.read = Thread(target=self.read_thread, args=[self.cap, self.frame_ori_queue, self.frame_detect_queue])
@@ -36,7 +36,7 @@ class face_thread():
     def read_thread(self, cap, frame_ori_queue, frame_detect_queue):
         while cap.isOpened():
             ret, frame = cap.read()
-            #frame = cv2.flip(frame, flipCode=1)
+            frame = cv2.flip(frame, flipCode=1)
             if not ret:
                 break
             frame_ori_queue.put(frame)
@@ -65,7 +65,6 @@ class face_thread():
                 for idx, kps in enumerate(kpss):
                     feet = face_model.face_encoding(frame, kps)
                     info = face_model.face_compare(feet)
-                    center = get_center(faces[idx])
                     info.update({'box': faces[idx]})
                     people.append(info)
             final_data = {'faces': faces, 'people': people}
@@ -91,10 +90,13 @@ class face_thread():
                     info = people[i]
                     color = compute_color_for_labels(sum([ord(character) for character in info['fullname']]))
                     name_display = unidecode(info['fullname'].split()[-1] + ' - %.2f' % (info['Sim']))
-                    t_size = cv2.getTextSize(name_display, fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1.0, thickness=1)[
-                        0]
-                    cv2.rectangle(frame, (face_box[0], face_box[1]),
-                                  (face_box[0] + t_size[0] + 10, face_box[1] + t_size[1] + 10), color, -1)
+                    t_size = cv2.getTextSize(name_display,
+                                             fontFace=cv2.FONT_HERSHEY_PLAIN,
+                                             fontScale=1.0, thickness=1)[0]
+                    cv2.rectangle(frame,
+                                  (face_box[0], face_box[1]),
+                                  (face_box[0] + t_size[0] + 10, face_box[1] + t_size[1] + 10),
+                                  color, -1)
                     cv2.rectangle(frame, (face_box[0], face_box[1]), (face_box[2], face_box[3]), color, 2)
                     cv2.putText(frame, name_display, (face_box[0], face_box[1] + t_size[1] + 5), cv2.FONT_HERSHEY_PLAIN,
                                 fontScale=1.0, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)

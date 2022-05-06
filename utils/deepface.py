@@ -47,6 +47,8 @@ division = _Feature((2, 2, 0, "alpha", 2),
                     (3, 0, 0, "alpha", 0),
                     CO_FUTURE_DIVISION)
 
+ep_list = ['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider']
+
 
 class ArcFaceONNX:
     def __init__(self, model_file=None, session=None):
@@ -75,7 +77,7 @@ class ArcFaceONNX:
         self.input_std = input_std
         # print('input mean and std:', self.input_mean, self.input_std)
         if self.session is None:
-            self.session = onnxruntime.InferenceSession(self.model_file, None)
+            self.session = onnxruntime.InferenceSession(self.model_file, None, providers=ep_list)
         input_cfg = self.session.get_inputs()[0]
         input_shape = input_cfg.shape
         input_name = input_cfg.name
@@ -182,14 +184,13 @@ def distance2kps(points, distance, max_shape=None):
 
 class RetinaFace:
     def __init__(self, model_file=None, session=None):
-        import onnxruntime
         self.model_file = model_file
         self.session = session
         self.taskname = 'detection'
         if self.session is None:
             assert self.model_file is not None
             assert osp.exists(self.model_file)
-            self.session = onnxruntime.InferenceSession(self.model_file, None)
+            self.session = onnxruntime.InferenceSession(self.model_file, None, providers=ep_list)
         self.center_cache = {}
         self.nms_thresh = 0.4
         self.det_thresh = 0.6

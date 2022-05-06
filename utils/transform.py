@@ -39,51 +39,11 @@ def _affine_matrix_from_vector(v):
 
 
 def _center_and_normalize_points(points):
-    """Center and normalize image points.
-
-    The points are transformed in a two-step procedure that is expressed
-    as a transformation matrix. The matrix of the resulting points is usually
-    better conditioned than the matrix of the original points.
-
-    Center the image points, such that the new coordinate system has its
-    origin at the centroid of the image points.
-
-    Normalize the image points, such that the mean distance from the points
-    to the origin of the coordinate system is sqrt(D).
-
-    If the points are all identical, the returned values will contain nan.
-
-    Parameters
-    ----------
-    points : (N, D) array
-        The coordinates of the image points.
-
-    Returns
-    -------
-    matrix : (D+1, D+1) array
-        The transformation matrix to obtain the new points.
-    new_points : (N, D) array
-        The transformed image points.
-
-    References
-    ----------
-    .. [1] Hartley, Richard I. "In defense of the eight-point algorithm."
-           Pattern Analysis and Machine Intelligence, IEEE Transactions on 19.6
-           (1997): 580-593.
-
-    """
     n, d = points.shape
     centroid = np.mean(points, axis=0)
 
     centered = points - centroid
     rms = np.sqrt(np.sum(centered ** 2) / n)
-
-    # if all the points are the same, the transformation matrix cannot be
-    # created. We return an equivalent matrix with np.nans as sentinel values.
-    # This obviates the need for try/except blocks in functions calling this
-    # one, and those are only needed when actual 0 is reached, rather than some
-    # small value; ie, we don't need to worry about numerical stability here,
-    # only actual 0.
     if rms == 0:
         return np.full((d + 1, d + 1), np.nan), np.full_like(points, np.nan)
 
@@ -107,29 +67,6 @@ def _center_and_normalize_points(points):
 
 
 def _umeyama(src, dst, estimate_scale):
-    """Estimate N-D similarity transformation with or without scaling.
-
-    Parameters
-    ----------
-    src : (M, N) array
-        Source coordinates.
-    dst : (M, N) array
-        Destination coordinates.
-    estimate_scale : bool
-        Whether to estimate scaling factor.
-
-    Returns
-    -------
-    T : (N + 1, N + 1)
-        The homogeneous similarity transformation matrix. The matrix contains
-        NaN values only if the problem is not well-conditioned.
-
-    References
-    ----------
-    .. [1] "Least-squares estimation of transformation parameters between two
-            point patterns", Shinji Umeyama, PAMI 1991, :DOI:`10.1109/34.88573`
-
-    """
 
     num = src.shape[0]
     dim = src.shape[1]
