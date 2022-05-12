@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import cv2
+import time
 
 from utils.deepface import *
 from utils.face_align import norm_crop
@@ -19,9 +20,11 @@ def compare_cosine(feet1, feet2):
 face_detect = RetinaFace(model_file='src/det_500m.onnx')
 face_recog = ArcFaceONNX(model_file='src/w600k_mbf.onnx')
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0) #'https://192.168.1.48:8080/video')
+cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
 
 while cap.isOpened():
+    last_time = time.time()
     ret, frame = cap.read()
     faces, kpss = face_detect.detect(frame)
 
@@ -36,8 +39,10 @@ while cap.isOpened():
     for face in faces:
         face_box = face.astype(np.int)
         cv2.rectangle(frame, (face_box[0], face_box[1]), (face_box[2], face_box[3]), (0, 0, 255), 2)
+    fps = 1/(time.time() - last_time)
+    print(fps)
 
     print('---------')
     cv2.imshow('Frame', frame)
-    cv2.waitKey(5)
+    cv2.waitKey(1)
 

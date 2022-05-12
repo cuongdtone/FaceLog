@@ -3,8 +3,9 @@ import numpy as np
 from .face import FaceRecog
 from queue import Queue
 from threading import Thread
-from .utils import compute_color_for_labels, get_center, center_match
+from .utils_calc import compute_color_for_labels, get_center, center_match
 from unidecode import unidecode
+import math
 
 
 class FaceThread():
@@ -18,7 +19,7 @@ class FaceThread():
         self.data_final_queue = Queue(maxsize=2)
         self.frame_final_queue = Queue(maxsize=2)
         self.data_output_queue = Queue(maxsize=2)
-        self.period = 1
+        self.period = 5
         self.count = 1
         self.out_people = [{'fullname': 'uknown', 'code': None, 'Sim': 0, 'center': np.array([0, 0])}]
         self.read = Thread(target=self.read_thread, args=[self.cap, self.frame_ori_queue, self.frame_detect_queue])
@@ -29,7 +30,13 @@ class FaceThread():
         self.detect.setDaemon(True)
         self.recognize.setDaemon(True)
         self.draw.setDaemon(True)
-        
+
+        self.freq = 0
+        self.fps_camera = cap.get(cv2.CAP_PROP_FPS)
+        self.fps_process = 15
+        self.drop_fps = math.ceil(self.fps_camera/self.fps_process)
+        print(self.drop_fps)
+
     def run(self):
         self.read.start()
         self.detect.start()
@@ -40,11 +47,11 @@ class FaceThread():
     def read_thread(self, cap, frame_ori_queue, frame_detect_queue):
         while cap.isOpened():
             ret, frame = cap.read()
-            # frame = cv2.flip(frame, flipCode=1)
-            if not ret:
-                break
-            frame_ori_queue.put(frame)
-            frame_detect_queue.put(frame)
+            self.freq += 1
+            if self.freq >= self.drop_fps:
+                frame_ori_queue.put(frame)
+                frame_detect_queue.put(frame)
+                self.freq = 0
         cap.release()
 
     def detect_thread(self, cap, face_model, frame_detect_queue, data_recognize_queue):
@@ -116,18 +123,3 @@ class FaceThread():
     def stop(self):
         self.cap.release()
 
-
-if __name__ == '__main__':
-    cap = cv2.VideoCapture('samples/binden.mp4')
-    face_recog = FaceThread(cap)
-    frame_final_queue = face_recog.run()
-    while True:
-        timer = cv2.getTickCount()
-        frame = frame_final_queue.get()
-        fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer)
-        t_size = cv2.getTextSize('FPS: %d'%(fps), cv2.FONT_HERSHEY_PLAIN, fontScale=2.0, thickness=2)[0]
-        cv2.rectangle(frame, (10, 10), (10+t_size[0]+10, 10+t_size[1]+10), (128, 0, 128), -1)
-        cv2.putText(frame, "FPS: %d"%(fps), (10, 10+t_size[1]+10-3), cv2.FONT_HERSHEY_PLAIN,
-                    fontScale=2.0, color=(255, 255, 255), thickness=2, lineType=cv2.LINE_AA)
-        cv2.imshow('img', frame)
-        cv2.waitKey(5)

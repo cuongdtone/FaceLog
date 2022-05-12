@@ -2,7 +2,7 @@ import time
 from utils.face import FaceRecog
 import cv2
 import os
-from utils.utils import save_new_image
+from utils.utils_calc import save_new_image
 from utils.sqlite_database import update_pkl_employee
 import argparse
 
