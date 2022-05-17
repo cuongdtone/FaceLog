@@ -169,6 +169,7 @@ class MultiCameraDetectThread():
                 kpss = data['kpss']
                 objects, input_centroid = self.ct[camId].update(faces)
                 out_info = []
+                final_data.update({camId: {'frame': frame, 'people': out_info}})
                 for idx, (objectID, centroid) in enumerate(objects.items()):
                     # cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
                     face_box, kps = find_faces(objectID, objects, input_centroid, faces, kpss)
@@ -193,7 +194,8 @@ class MultiCameraDetectThread():
                                              fontScale=1.0, thickness=1)[0]
                     cv2.putText(frame, text, (int(face_box[0]), int(face_box[1] + t_size[1] + 5)), cv2.FONT_HERSHEY_PLAIN,
                                 fontScale=1.0, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
-                    final_data.update({camId: {'frame': frame, 'people': out_info}})
+                    final_data[camId] = {'frame': frame, 'people': out_info}
+
 
             data_final_queue.put(final_data)
 
