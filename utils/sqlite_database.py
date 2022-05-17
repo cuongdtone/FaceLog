@@ -4,8 +4,9 @@ from pathlib import Path
 QUERY_INSERT_EMP = "INSERT INTO employee ( code, fullname, name, sex, branch, vocative, created_user, isadmin) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);"
 QUERY_UPDATE_EMP = "UPDATE employee SET fullname = ?, sex = ?, vocative = ?, updated_user = ?, isadmin=?, status = ?, active = ? WHERE code = ?;"
 QUERY_UPDATE_STATUS_EMP = "UPDATE employee SET status = ? WHERE code = ?;"
-QUERY_UPDATE_PKL_EMP = "UPDATE employee SET pkl_file = ? WHERE code = ?;"
 QUERY_INSERT_TKP = """INSERT INTO timekeepings ( code, fullname, device_name, source, image) VALUES (?, ? , ?, ?, ?);"""
+QUERY_UPDATE_FEATURE_EMP = "UPDATE employee SET face_feature = ? WHERE code = ?;"
+
 
 
 def connect_database():
@@ -73,18 +74,16 @@ def update_employee(db, code: str, fullname: str, sex: int, updated_user: str, i
 
     return execute(db, QUERY_UPDATE_EMP, (fullname, sex, vocative, updated_user, isadmin, status, active, code))
 
+def update_face_feature_employee(db, code: str, feat: str):
+    return execute(db, QUERY_UPDATE_FEATURE_EMP, (feat, code))
 
 def update_status_employee(db, code: str, status=1):
     return execute(db, QUERY_UPDATE_STATUS_EMP, (status, code))
 
 
-def update_pkl_employee(db, code: str, pkl_path: str):
-    return execute(db, QUERY_UPDATE_PKL_EMP, (pkl_path, code))
-
-
 def get_all_employee(db):
     try:
-        query = "SELECT code, fullname, name, active, isadmin, sex, vocative, position, birthday, branch, department, avatar, created_date, created_user, img_data, pkl_file  FROM employee;"
+        query = "SELECT code, fullname, name, active, isadmin, sex, vocative, position, birthday, branch, department, avatar, created_date, created_user, img_data, face_feature  FROM employee;"
         if db is None:
             db = connect_database()
         cur = db.cursor()
@@ -102,4 +101,3 @@ def get_all_employee(db):
 
 def insert_timekeeping(db, code: str, fullname: str, device_name: str, source='FI', image=''):
     return execute(db, QUERY_INSERT_TKP, (code, fullname, device_name, source, image))
-

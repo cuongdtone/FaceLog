@@ -2,8 +2,8 @@ from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np
 
-from .face_align import norm_crop
-from .eye_blink import Eye
+from .face_aligner import norm_crop
+
 import cv2
 
 class CentroidTracker():
@@ -100,7 +100,7 @@ def find_faces(id, objects, input_centroid, faces, kpss):
 	return None, None
 
 
-class Follow_track():
+class Track():
 	def __init__(self):
 		self.people_tracked = {}
 		self.frame_FAS = 8
@@ -108,13 +108,13 @@ class Follow_track():
 		self.verify_threshold = 0.7
 		self.recog_frame = self.frame_verify
 
-		self.eye = Eye()
-	def update(self, id, box, kps, frame, face_recognizer, recog):
+		# self.eye = Eye()
+	def update(self, id, box, kps, frame, face_recognizer, employees_data, recog):
 
 		if not id in self.people_tracked.keys():
 			self.people_tracked.update({id: {'box': box,
 							  'kps': kps,
-							  'FAS': 0,
+							  'FAS': 1,
 							  'verify': None,
 							  'FAS_eye_blink':[]}}) # 0: not, 1: OK
 		else:
@@ -141,12 +141,13 @@ class Follow_track():
 					if self.people_tracked[id]['verify'] is None:
 						if recog:
 							feet = face_recognizer.face_encoding(frame, kps)
-							info = face_recognizer.face_compare(feet)
+							info = face_recognizer.face_compare(feet, employees_data)
 							if info['Sim'] > self.verify_threshold:
 								print(info)
 								self.people_tracked[id]['verify'] = info
 
 		return self.people_tracked[id]['verify']
+
 
 
 

@@ -1,15 +1,49 @@
 import time
-from utils.face import FaceRecog
 import cv2
 import os
-from utils.utils_calc import save_new_image
-from utils.sqlite_database import update_pkl_employee
+
+from utils.sqlite_database import update_face_feature_employee
+from utils.face_detecter import RetinaFace
+from utils.face_recognizer import ArcFaceONNX
 import argparse
+import glob
+import numpy as np
+
 
 id = input('ID : ')
 camera = 2
 
-# Phase 1: Select ROI and take img
+
+def save_new_image(dir, image):
+    c = 1
+    while os.path.exists(os.path.join(dir, '%d.jpg'%(c))):
+        c += 1
+    cv2.imwrite(os.path.join(dir, '%d.jpg'%(c)), image)
+
+
+face_detect = RetinaFace(model_file='src/det_500m.onnx')
+face_recognize = ArcFaceONNX(model_file='src/w600k_mbf.onnx')
+
+
+def create_feat(db_path, id_code):
+    path_to_dir = os.path.join(db_path, id_code)
+    # position = input("Position:  ")
+    # office = input("Office:  ")
+    list_img = glob.glob(os.path.join(path_to_dir, '*.jpg')) + \
+               glob.glob(os.path.join(path_to_dir, '*.jpeg')) + \
+               glob.glob(os.path.join(path_to_dir, '*.png'))
+    feets = []
+    for i in list_img:
+        image = cv2.imread(i)
+        try:
+            faces, kpss = face_detect.detect(image, max_num=0, metric='default', input_size=(640, 640))
+            feet = face_recognize.face_encoding(image, kpss[0])
+            feets.append(feet)
+        except:
+            continue
+    feet = np.sum(np.array(feets), axis=0) / len(feets)
+    return feet
+
 
 db_root = 'src/data'
 person = os.path.join(db_root, id)
@@ -40,11 +74,12 @@ if Cap:
             break
     cap.release()
 
-# Phase 2: create pkl file
-face_model = FaceRecog(None)
-face_model.create_data_file(db_root, id)
+
+feat = create_feat(db_root, id)
+
+# print(feat)
 
 # Phase 3: update DB
-update_pkl_employee(None, id, id + '.pkl')
+update_face_feature_employee(None, id, str(feat))
 
 # Phase 4: delete img dir

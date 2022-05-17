@@ -1,19 +1,16 @@
 DB_PATH: src/TimeKeepingDB.db
-URL_API: http://103.113.83.194:9001/api/t
+URL_API: http://172.29.13.17:8001/api/t
 avatar_path: media/avatar/
 branch: DNA
-camera: 0
+id_camera_1: 0 #rtsp://admin:tmt123123@@172.29.7.100:554/cam/realmonitor?channel=1&subtype=0
+id_camera_2: 2 #rtsp://admin:tmt123123@@172.29.7.104:554/cam/realmonitor?channel=1&subtype=0
 checkin_path: media/checkin_images/
 data_path: media/data/
-delay_people: 3
-delay_timekeep: 10
+delay_people: 1
+delay_timekeep: 1
 device_name: FI_03
 password: fa48c5c59d72875141cd0821f7e8879f8c58f82fa75e3cb0f992382b42a9b523672b3e118dc5d93da792674b3cfda8f002177719ebb423006584d02e7886bb6e
 password_login: 310f595837a4902335749dd83088c6f3c6a9b7d236633ac6e15aaa1cc41a7623887d7c5b80d222c7184f3a93e0dbca2eabf8e3af8d796f89c1773a6f969e2649401e837e0dba2f6e10d6f0b8a58887d79db85ce01453626295e7abab1054d848758b2c7a7a3e4572812406af9fac863d1088ea83cfcbc8ca26aa08c62d88d5e5c915281fd26ca9dc72c5bcd650f2ff38b591eb3724f18d85a645342246a9d4324201337128cc0c7a876bd0eba0a6613d18959b874554113b45f3c4355d38544a7a754ea0174e798c4ad266b896c3302561f829ee87e8604104ecaa326dd11e75d53ba5b67dbf2688daf18f6184d00606fc99571d9629c16c98f5089fce7b6436ff446e7d0742217c32cce12a6833afa9146f5d23bd4bd4e05dae8380237223f90e4c1b5a3b9b90d51a4118e84bd628a2588a4c69533e667a363b19fd6813449eaccfb48c0823d2dad44f2dd22ee802d095b193aee158af9813bb1de54af4bda91aa96d79b56ca2f97f8a87739087ddc207005a4ff8615287cdcbfca8419aa748
 private_key_path: ./src/private.pem
 public_key_path: ./src/public.pem
 username_login: chinhanhdanang
-
-db_local: ./src/data
-front_camera: 2 # https://192.168.1.48:8080/video #rtsp://admin:tmt123123@@172.29.7.100:554/cam/realmonitor?channel=1&subtype=0
-back_camera: 1

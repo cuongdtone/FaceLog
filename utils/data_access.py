@@ -150,7 +150,7 @@ def get_timekeeping_from_local(DB_PATH):
         cur = con.cursor()
         list_dict_timekeepings = []
         for row in cur.execute(
-                'select code, fullname, working_date, checkin, device_name, source, image from timekeepings where status = 0 limit 100'):
+                'select code, fullname, working_date, checkin, device_name, source, image from timekeepings where status = 0 limit 10'):
             list_dict_timekeepings.append(modified_timekeepings(row))
         con.close()
         return list_dict_timekeepings

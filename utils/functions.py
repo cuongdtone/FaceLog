@@ -2,23 +2,27 @@
 # 11/1/2021
 # -*-encoding:utf-8-*-
 
-import cv2
-import numpy as np
 import threading
+import multiprocessing as mp
+import cv2
 
 
-def preprocess_image(img):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, (96, 112))
-    img = (img.astype('float32') - 127.5) / 128.0
-    img = np.expand_dims(img, axis=0)
-    return img
+class bufferless_camera(threading.Thread):
+    def __init__(self, rtsp_url, name='camera-buffer-cleaner-thread'):
+        self.camera = cv2.VideoCapture(rtsp_url)
+        self.last_frame = None
+        super(bufferless_camera, self).__init__(name=name)
+        self.start()
 
+    def run(self):
+        while self.check_cam():
+            ret, self.last_frame = self.camera.read()
 
-def cal_distance_face(embedding_1, embedding_2):
-    embedding_1 /= np.expand_dims(np.sqrt(np.sum(np.power(embedding_1, 2), 1)), 1)
-    embedding_2 /= np.expand_dims(np.sqrt(np.sum(np.power(embedding_2, 2), 1)), 1)
-    return np.sum(np.multiply(embedding_1, embedding_2), 1)
+    def get_frame(self):
+        return self.last_frame
+
+    def check_cam(self):
+        return self.camera.isOpened()
 
 
 class CustomThread(threading.Thread):
@@ -33,3 +37,12 @@ class CustomThread(threading.Thread):
     def join(self, *args):
         threading.Thread.join(self, *args)
         return self._return
+
+palette = (2 ** 11 - 1, 2 ** 15 - 1, 2 ** 20 - 1)
+
+def compute_color_for_labels(label):
+    """
+    Simple function that adds fixed color depending on the class
+    """
+    color = [int((p * (label ** 2 - label + 1)) % 255) for p in palette]
+    return tuple(color)
