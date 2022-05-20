@@ -2,8 +2,33 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="014065de-26a8-4f71-8ff3-b183106eec2f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/timekeeping.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/add_new_employee.py" beforeDir="false" afterPath="$PROJECT_DIR$/add_new_employee.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/TimeKeepingDB.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/TimeKeepingDB.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10028.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10055.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10059.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10060.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10168.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10168/1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10168/2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10168/3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10168/4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/10168/5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/settings.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/settings.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/face_aligner.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/face_aligner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/face_mask.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/face_mask.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/face_recognizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/face_recognizer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/face_thread.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/face_thread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/face_tracker.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/face_tracker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/load_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/load_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/sqlite_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/sqlite_database.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,17 +54,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/cuong/Desktop/presenter_support&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Python&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/home/cuong/Desktop/TMT/timekeeping",
+    "settings.editor.selected.configurable": "preferences.sourceCode.Python"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/utils" />
+      <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
@@ -64,7 +90,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="get_feat" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="face_recognizer" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="timekeeping" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -72,11 +98,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/get_feat.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/face_recognizer.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -106,7 +132,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="new_main_2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="timekeeping" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -118,7 +144,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/new_main_2.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -127,7 +153,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="test_batch_for_model" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="timekeeping" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="timekeeping" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -135,11 +161,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_batch_for_model.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/timekeeping.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -151,10 +177,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.test_batch_for_model" />
-        <item itemvalue="Python.new_main_2" />
+        <item itemvalue="Python.timekeeping" />
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.face_recognizer" />
         <item itemvalue="Python.add_new_employee" />
-        <item itemvalue="Python.get_feat" />
       </list>
     </recent_temporary>
   </component>
@@ -168,5 +194,16 @@
       <updated>1652436814559</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

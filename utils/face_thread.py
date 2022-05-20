@@ -2,19 +2,20 @@ import cv2
 import numpy as np
 from queue import Queue
 from threading import Thread
+from .face_pose import PoseEstimator
 from .face_tracker import *
-from .face_detecter import RetinaFace
-from .face_recognizer import ArcFaceONNX, Face
 from .functions import bufferless_camera
 from .functions import compute_color_for_labels
 from unidecode import unidecode
 
 
 class CameraDetectThread():
-    def __init__(self, rtsp_url, face_detecter, face_recognizer, employees_data=None):
+    def __init__(self, rtsp_url, face_detecter, face_recognizer, face_landmark,employees_data=None):
         self.employees_data = employees_data
         self.face_detecter = face_detecter #RetinaFace(model_file='src/det_500m.onnx')
         self.face_recognizer = face_recognizer #ArcFaceONNX(model_file='src/w600k_mbf.onnx')
+        self.face_landmark = face_landmark
+
         self.track = Track()
         self.ct = CentroidTracker()
 
@@ -95,23 +96,29 @@ class CameraDetectThread():
 
 
 class MultiCameraDetectThread():
-    def __init__(self, rtsp_url_list, face_detecter, face_recognizer, employees_data=None):
+    def __init__(self, rtsp_url_list, face_detecter, face_recognizer, face_landmark, face_mask, employees_data=None):
         self.employees_data = employees_data
         self.face_detecter = face_detecter  # RetinaFace(model_file='src/det_500m.onnx')
         self.face_recognizer = face_recognizer  # ArcFaceONNX(model_file='src/w600k_mbf.onnx')
+        self.face_landmark = face_landmark
+        self.face_mask = face_mask
         # self.track = Track()
         # self.ct = CentroidTracker()
         self.camera = {}
         self.track = {}
         self.ct = {}
+        self.face_pose = {}
+        self.rtsp_url_list = rtsp_url_list
         for idx, rtsp_url in enumerate(rtsp_url_list):
             clean_camera = bufferless_camera(rtsp_url)
             if clean_camera.check_cam():
                 self.camera.update({idx: clean_camera})
                 track = Track()
                 ct = CentroidTracker()
+                face_pose = PoseEstimator(img_size=clean_camera.get_resolution())
                 self.track.update({idx: track})
                 self.ct.update({idx: ct})
+                self.face_pose.update({idx: face_pose})
         if len(self.camera.keys()) < 1:
             print("[INFO] Can't connect to all camera ! \n System exit !")
             exit(0)
@@ -121,14 +128,14 @@ class MultiCameraDetectThread():
         self.data_recognize_queue = Queue(maxsize=2)
         self.data_final_queue = Queue(maxsize=2)
         self.frame_final_queue = Queue(maxsize=2)
-        self.period = 2
+        self.period = 3
         self.count = self.period
         self.detect = Thread(target=self.detect_thread, args=[self.frame_ori_queue, self.data_recognize_queue])
         self.recognize = Thread(target=self.recognize_thread, args=[self.data_recognize_queue, self.data_final_queue])
         self.detect.setDaemon(True)
         self.recognize.setDaemon(True)
 
-    def check_alive_cam(self):
+    def check_alive_cam(self, reconnect=False):
         for camId in self.camera.keys():
             cam = self.camera[camId]
             if cam.check_cam() is False:
@@ -145,7 +152,7 @@ class MultiCameraDetectThread():
         return self.data_final_queue, self.frame_ori_queue
 
     def detect_thread(self, frame_ori_queue, data_recognize_queue):
-        while self.check_alive_cam():
+        while self.check_alive_cam(reconnect=True):
             put_data = {}
             frames_ori = {}
             for camId in self.camera.keys():
@@ -170,12 +177,18 @@ class MultiCameraDetectThread():
                 objects, input_centroid = self.ct[camId].update(faces)
                 out_info = []
                 final_data.update({camId: {'frame': frame, 'people': out_info}})
+
+                param_lst, roi_box_lst = self.face_landmark(frame, faces)
+                landmarks = self.face_landmark.recon_vers(param_lst, roi_box_lst, dense_flag=False)
+
                 for idx, (objectID, centroid) in enumerate(objects.items()):
                     # cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
-                    face_box, kps = find_faces(objectID, objects, input_centroid, faces, kpss)
+                    face_box, kps, landmark = find_faces(objectID, objects, input_centroid, faces, kpss, landmarks)
+                    rotation_vector, translation_vector = self.face_pose[camId].solve_pose_by_68_points(landmark.T[:, :2])
+
                     face_box = face_box.astype(np.int)
-                    info = self.track[camId].update(objectID, face_box, kps, frame, self.face_recognizer, self.employees_data,
-                                             self.count >= self.period)
+                    info = self.track[camId].update(objectID, face_box, kps, frame, self.face_recognizer, self.face_mask, self.employees_data,
+                                             self.count >= self.period, rotation_vector)
 
                     text = "{}".format(objectID)
                     cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
@@ -183,6 +196,7 @@ class MultiCameraDetectThread():
                     if face_box is None:
                         continue
                     color = compute_color_for_labels(objectID)
+                    self.face_pose[camId].draw_annotation_box(frame, rotation_vector, translation_vector, color=color)
                     cv2.rectangle(frame, (face_box[0], face_box[1]), (face_box[2], face_box[3]), color, 2)
                     if info is None:
                         text = 'Verifing'
@@ -195,10 +209,7 @@ class MultiCameraDetectThread():
                     cv2.putText(frame, text, (int(face_box[0]), int(face_box[1] + t_size[1] + 5)), cv2.FONT_HERSHEY_PLAIN,
                                 fontScale=1.0, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
                     final_data[camId] = {'frame': frame, 'people': out_info}
-
-
             data_final_queue.put(final_data)
-
             if self.count >= self.period:
                 self.count = 0
             else:

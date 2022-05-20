@@ -4,7 +4,7 @@
 
 import cv2
 import numpy as np
-import onnx
+
 import onnxruntime
 from numpy.linalg import norm as l2norm
 from .face_aligner import norm_crop
@@ -16,23 +16,23 @@ class ArcFaceONNX:
         self.model_file = model_file
         self.session = session
         self.taskname = 'recognition'
-        find_sub = False
-        find_mul = False
-        model = onnx.load(self.model_file)
-        graph = model.graph
-        for nid, node in enumerate(graph.node[:8]):
-            # print(nid, node.name)
-            if node.name.startswith('Sub') or node.name.startswith('_minus'):
-                find_sub = True
-            if node.name.startswith('Mul') or node.name.startswith('_mul'):
-                find_mul = True
-        if find_sub and find_mul:
-            # mxnet arcface model
-            input_mean = 0.0
-            input_std = 1.0
-        else:
-            input_mean = 127.5
-            input_std = 127.5
+        # find_sub = False
+        # find_mul = False
+        # model = onnx.load(self.model_file)
+        # graph = model.graph
+        # for nid, node in enumerate(graph.node[:8]):
+        #     # print(nid, node.name)
+        #     if node.name.startswith('Sub') or node.name.startswith('_minus'):
+        #         find_sub = True
+        #     if node.name.startswith('Mul') or node.name.startswith('_mul'):
+        #         find_mul = True
+        # if find_sub and find_mul:
+        #     # mxnet arcface model
+        #     input_mean = 0.0
+        #     input_std = 1.0
+        # else:
+        input_mean = 127.5
+        input_std = 127.5
         self.input_mean = input_mean
         self.input_std = input_std
         # print('input mean and std:', self.input_mean, self.input_std)
@@ -93,13 +93,13 @@ class ArcFaceONNX:
         info = {'fullname': 'uknown', 'Sim': max_sim, 'code': None}
         if employees_data is not None:
             for data in employees_data:
-                feet_compare = data['feet']
+                feet_compare = data[2]
                 sim = self.compute_sim(feet, feet_compare)
                 if sim > threshold and sim > max_sim:
                     max_sim = sim
-                    info['fullname'] = data["fullname"]
+                    info['fullname'] = data[0]
                     info['Sim'] = max_sim
-                    info['code'] = data['code']
+                    info['code'] = data[1]
         return info
 
 

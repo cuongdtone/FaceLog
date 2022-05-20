@@ -5,24 +5,57 @@
 import threading
 import multiprocessing as mp
 import cv2
+import os
+import os.path as osp
+from pathlib import Path
+import pickle
+import time
+
+
+def get_object(name):
+    with open(name, 'rb') as f:
+        obj = pickle.load(f)
+    return obj
+
 
 
 class bufferless_camera(threading.Thread):
     def __init__(self, rtsp_url, name='camera-buffer-cleaner-thread'):
+        self.rtsp = rtsp_url
         self.camera = cv2.VideoCapture(rtsp_url)
+        self.fps = 25
         self.last_frame = None
         super(bufferless_camera, self).__init__(name=name)
         self.start()
 
     def run(self):
-        while self.check_cam():
+        while True:
             ret, self.last_frame = self.camera.read()
+            # if last_frame is not None:
+            #     self.last_frame = last_frame
+            # else:
+            #     print('[INFO] Reconnecting !')
+            #     self.reconnect()
+
+    def reconnect(self):
+        self.camera.release()
+        del self.camera
+        time.sleep(0.01)
+        self.camera = cv2.VideoCapture(self.rtsp)
 
     def get_frame(self):
+
+        self.last_time = time.time()
         return self.last_frame
+
 
     def check_cam(self):
         return self.camera.isOpened()
+
+    def get_resolution(self):
+        width = self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        return (height, width)
 
 
 class CustomThread(threading.Thread):

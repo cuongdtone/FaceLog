@@ -6,8 +6,9 @@ from utils.sqlite_database import update_face_feature_employee
 from utils.face_detecter import RetinaFace
 from utils.face_recognizer import ArcFaceONNX
 import argparse
-import glob
+from pathlib import Path
 import numpy as np
+
 
 
 id = input('ID : ')
@@ -29,12 +30,11 @@ def create_feat(db_path, id_code):
     path_to_dir = os.path.join(db_path, id_code)
     # position = input("Position:  ")
     # office = input("Office:  ")
-    list_img = glob.glob(os.path.join(path_to_dir, '*.jpg')) + \
-               glob.glob(os.path.join(path_to_dir, '*.jpeg')) + \
-               glob.glob(os.path.join(path_to_dir, '*.png'))
+    list_img = Path(path_to_dir)
+    list_img = list_img.rglob('*.[jp][pn]*')
     feets = []
     for i in list_img:
-        image = cv2.imread(i)
+        image = cv2.imread(i.as_posix())
         try:
             faces, kpss = face_detect.detect(image, max_num=0, metric='default', input_size=(640, 640))
             feet = face_recognize.face_encoding(image, kpss[0])

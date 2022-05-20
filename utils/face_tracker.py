@@ -1,10 +1,9 @@
 from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np
-
 from .face_aligner import norm_crop
-
 import cv2
+
 
 class CentroidTracker():
 	def __init__(self, maxDisappeared=0):
@@ -93,58 +92,64 @@ class CentroidTracker():
 		return self.objects, inputCentroids
 
 
-def find_faces(id, objects, input_centroid, faces, kpss):
+def find_faces(id, objects, input_centroid, faces, kpss, landmarks):
 	for idx, c in enumerate(input_centroid):
 		if objects[id][0] == c[0] and objects[id][1] == c[1]:
-			return faces[idx], kpss[idx]
-	return None, None
+			return faces[idx], kpss[idx], landmarks[idx]
+	return None, None, None
 
 
 class Track():
-	def __init__(self):
+	def __init__(self, img_size=(640, 480), time_track_fas=2, fps_process=10):
 		self.people_tracked = {}
-		self.frame_FAS = 8
+		self.frame_FAS = fps_process * time_track_fas
 		self.frame_verify = 1
 		self.verify_threshold = 0.7
 		self.recog_frame = self.frame_verify
 
 		# self.eye = Eye()
-	def update(self, id, box, kps, frame, face_recognizer, employees_data, recog):
+
+	def update(self, id, box, kps, frame, face_recognizer, face_mask, employees_data, recog, rotation_face):
 
 		if not id in self.people_tracked.keys():
 			self.people_tracked.update({id: {'box': box,
 							  'kps': kps,
-							  'FAS': 1,
+							  'FAS': 0,
 							  'verify': None,
-							  'FAS_eye_blink':[]}}) # 0: not, 1: OK
+							  'FAS_track_frame':[]}})
 		else:
 			if box is None and kps is None:
 				self.people_tracked.pop(id)
 				return None
 			else: # Update old person
-				# self.people_tracked[id] = [box, kps]
 				# FAS method
 				if self.people_tracked[id]['FAS'] == 0:
-					if len(self.people_tracked[id]['FAS_eye_blink']) >= self.frame_FAS:
-						self.people_tracked[id]['FAS_eye_blink'] = \
-							list(filter((1).__ne__, self.people_tracked[id]['FAS_eye_blink']))
-						print(f'Blink detection id {id}: ', np.std(self.people_tracked[id]['FAS_eye_blink']))
-						if np.std(self.people_tracked[id]['FAS_eye_blink']) >= 0.8:
-							self.people_tracked[id]['FAS'] = 1 # set flag face is real
-						self.people_tracked[id]['FAS_eye_blink'] = []
+					if len(self.people_tracked[id]['FAS_track_frame']) >= self.frame_FAS:
+						total_angle = np.array(self.people_tracked[id]['FAS_track_frame'])
+						a1 = np.std(total_angle[:, 0])
+						a2 = np.std(total_angle[:, 1])
+						if a1 > 0.17 or a2 > 0.17:
+							print('Real Face')
+							self.people_tracked[id]['FAS'] = 1
+						else:
+							print('Fake Face')
+							self.people_tracked[id]['FAS_track_frame'] = []
 					else:
-						pred_eye, left_eye, right_eye = self.eye.predict(frame, kps)
-						self.people_tracked[id]['FAS_eye_blink'].append(pred_eye)
+						self.people_tracked[id]['FAS_track_frame'].append(rotation_face.T[0])
 				# face is real
 				if self.people_tracked[id]['FAS'] == 1:
 					# verify is not None: pass
 					if self.people_tracked[id]['verify'] is None:
 						if recog:
-							feet = face_recognizer.face_encoding(frame, kps)
-							info = face_recognizer.face_compare(feet, employees_data)
-							if info['Sim'] > self.verify_threshold:
-								print(info)
-								self.people_tracked[id]['verify'] = info
+							aimg = norm_crop(frame, kps)
+							if face_mask.predict(aimg):
+								feet = face_recognizer.face_encoding(frame, kps)
+								info = face_recognizer.face_compare(feet, employees_data)
+								if info['Sim'] > self.verify_threshold:
+									print(info)
+									self.people_tracked[id]['verify'] = info
+							else:
+								print('Have mask')
 
 		return self.people_tracked[id]['verify']
 

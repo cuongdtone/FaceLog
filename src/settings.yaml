@@ -2,7 +2,7 @@ DB_PATH: src/TimeKeepingDB.db
 URL_API: http://172.29.13.17:8001/api/t
 avatar_path: media/avatar/
 branch: DNA
-id_camera_1: 0 #rtsp://admin:tmt123123@@172.29.7.100:554/cam/realmonitor?channel=1&subtype=0
+id_camera_1: 1 #http://192.168.1.48:8080/video #rtsp://admin:tmt123123@@172.29.7.100:554/cam/realmonitor?channel=1&subtype=0
 id_camera_2: 2 #rtsp://admin:tmt123123@@172.29.7.104:554/cam/realmonitor?channel=1&subtype=0
 checkin_path: media/checkin_images/
 data_path: media/data/

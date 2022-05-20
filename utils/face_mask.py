@@ -1,21 +1,28 @@
 """ Created by MrBBS """
-# 11/9/2021
+# 2/10/2022
 # -*-encoding:utf-8-*-
 
-from tensorflow.keras.models import load_model
-import cv2
 import numpy as np
+import onnxruntime
+import cv2
 
-mask_detection = load_model('./src/mask_detection.h5')
 
+class MaskDetection:
+    def __init__(self, weight='model_mask.onnx'):
+        self.sess = onnxruntime.InferenceSession(weight, provider_options=['CPUExecutionProvider'])
+        self.input_name = self.sess.get_inputs()[0].name
+        self.output_name = self.sess.get_outputs()[0].name
 
-def MaskDetect(image):
-    try:
-        face = cv2.resize(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), (16, 16))
-        face = np.expand_dims(np.expand_dims(face, axis=2), axis=0)
-        label = int(list(mask_detection.predict(face)[0]).index(1.))
-        if label == 1:
-            return True
-    except:
-        pass
-    return False
+    def predict(self, image_face):
+        """
+        iamge_face: norm crop face
+        Kiểm tra khuôn mặt có đeo khẩu trang hay không
+        :param image_face: hình ảnh ( np.array ) face
+        :return: True / False ( Không đeo / Đeo )
+        """
+        h, w = image_face.shape[:2]
+        image_face = image_face[h // 6:h, w // 5:w - w // 5]
+        image_face = cv2.resize(cv2.cvtColor(image_face, cv2.COLOR_BGR2GRAY), (16, 16))
+        image_face = np.expand_dims(np.expand_dims(image_face, axis=2), axis=0).astype(np.float32)
+        pred = self.sess.run([self.output_name], {self.input_name: image_face})[0]
+        return np.argmax(pred) == 1

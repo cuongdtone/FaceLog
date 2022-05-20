@@ -1,2 +1,5 @@
 media/*
 test_batch_for_model.py
+test.py
+test_Real_Fake.py
+test_reconnect_camera.py

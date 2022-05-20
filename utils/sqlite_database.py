@@ -1,11 +1,11 @@
 import sqlite3
 from pathlib import Path
 
-QUERY_INSERT_EMP = "INSERT INTO employee ( code, fullname, name, sex, branch, vocative, created_user, isadmin) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);"
-QUERY_UPDATE_EMP = "UPDATE employee SET fullname = ?, sex = ?, vocative = ?, updated_user = ?, isadmin=?, status = ?, active = ? WHERE code = ?;"
+QUERY_INSERT_EMP = "INSERT INTO employee ( code, fullname, name, sex, branch, vocative) VALUES (?, ?, ?, ?, ?, ?);"
+QUERY_UPDATE_EMP = "UPDATE employee SET fullname = ?, sex = ?, active = ? WHERE code = ?;"
 QUERY_UPDATE_STATUS_EMP = "UPDATE employee SET status = ? WHERE code = ?;"
 QUERY_INSERT_TKP = """INSERT INTO timekeepings ( code, fullname, device_name, source, image) VALUES (?, ? , ?, ?, ?);"""
-QUERY_UPDATE_FEATURE_EMP = "UPDATE employee SET face_feature = ? WHERE code = ?;"
+QUERY_UPDATE_FEATURE_EMP = "UPDATE employee SET embed = ? WHERE code = ?;"
 
 
 
@@ -51,7 +51,7 @@ def get_employee_code(db=None):
         return "10001"
 
 
-def insert_employee(db, code: str, fullname: str, sex: int, branch: str, created_user: str, isadmin=False):
+def insert_employee(db, code: str, fullname: str, sex: int, branch: str, isadmin=False):
     if sex == 0:
         vocative = "Anh|Bạn"
     elif sex == 1:
@@ -61,7 +61,7 @@ def insert_employee(db, code: str, fullname: str, sex: int, branch: str, created
 
     name = str(fullname).split(" ")[-1]
 
-    return execute(db, QUERY_INSERT_EMP, (code, fullname, name, sex, branch, vocative, created_user, isadmin))
+    return execute(db, QUERY_INSERT_EMP, (code, fullname, name, sex, branch, vocative, isadmin))
 
 
 def update_employee(db, code: str, fullname: str, sex: int, updated_user: str, isadmin=False, status=0, active=False):
@@ -83,7 +83,7 @@ def update_status_employee(db, code: str, status=1):
 
 def get_all_employee(db):
     try:
-        query = "SELECT code, fullname, name, active, isadmin, sex, vocative, position, birthday, branch, department, avatar, created_date, created_user, img_data, face_feature  FROM employee;"
+        query = "SELECT code, fullname, name, active, sex, vocative, position, birthday, branch, department, created_date, embed  FROM employee;"
         if db is None:
             db = connect_database()
         cur = db.cursor()
