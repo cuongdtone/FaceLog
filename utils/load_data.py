@@ -13,9 +13,10 @@ def load_user_data():
     data = []
     for user in users_info:
         if user["embed"] is not None and len(user["embed"]) != 0:
-            info = [user['fullname'], user['code'], str2np(user['embed'])]
+            info = [user['code'], user['fullname'], user['name'], str2np(user['embed'])]
             data.append(info)
     data = np.array(data)
+    print(data)
     return data, users_info
 
 

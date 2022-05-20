@@ -93,13 +93,13 @@ class ArcFaceONNX:
         info = {'fullname': 'uknown', 'Sim': max_sim, 'code': None}
         if employees_data is not None:
             for data in employees_data:
-                feet_compare = data[2]
+                feet_compare = data[3]
                 sim = self.compute_sim(feet, feet_compare)
                 if sim > threshold and sim > max_sim:
                     max_sim = sim
-                    info['fullname'] = data[0]
+                    info['fullname'] = data[1]
                     info['Sim'] = max_sim
-                    info['code'] = data[1]
+                    info['code'] = data[0]
         return info
 
 
