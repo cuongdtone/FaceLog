@@ -35,6 +35,8 @@ def checkin(people, checkin_list, employees, frame_ori, config):
     checkin_list_code = checkin_list.keys()
     now = datetime.now()
     timenow = now.strftime('%Y-%m-%d %H:%M:%S')
+    if now.strftime('%H:%M:%S') == '00:00:00':
+        return {}
     for info in people:
         code = info['code']
         if code is None:  # uknown person
