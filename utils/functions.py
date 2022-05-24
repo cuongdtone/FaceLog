@@ -10,13 +10,13 @@ import os.path as osp
 from pathlib import Path
 import pickle
 import time
+import sys
 
 
 def get_object(name):
     with open(name, 'rb') as f:
         obj = pickle.load(f)
     return obj
-
 
 
 class bufferless_camera(threading.Thread):
@@ -48,7 +48,6 @@ class bufferless_camera(threading.Thread):
         self.last_time = time.time()
         return self.last_frame
 
-
     def check_cam(self):
         return self.camera.isOpened()
 
@@ -79,3 +78,40 @@ def compute_color_for_labels(label):
     """
     color = [int((p * (label ** 2 - label + 1)) % 255) for p in palette]
     return tuple(color)
+
+
+class Watcher(threading.Thread):
+    running = True
+    refresh_delay_secs = 1
+
+    def __init__(self, watch_file, call_func_on_change=None, *args, **kwargs):
+        self._cached_stamp = 0
+        self.filename = watch_file
+        self.call_func_on_change = call_func_on_change
+        self.args = args
+        self.kwargs = kwargs
+        super(Watcher, self).__init__()
+        self.start()
+
+    def look(self):
+        stamp = os.stat(self.filename).st_mtime
+        if stamp != self._cached_stamp:
+            self._cached_stamp = stamp
+            # File has changed, so do something...
+            if self.call_func_on_change is not None:
+                self.call_func_on_change(*self.args, **self.kwargs)
+
+    def run(self):
+        while self.running:
+            try:
+                # Look for changes
+                time.sleep(self.refresh_delay_secs)
+                self.look()
+            except KeyboardInterrupt:
+                print('\nDone')
+                break
+            except FileNotFoundError:
+                # Action on file not found
+                pass
+            except:
+                print('Unhandled error: %s' % sys.exc_info()[0])
