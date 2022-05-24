@@ -14,7 +14,6 @@ from utils.face_thread import MultiCameraDetectThread
 
 
 class Main:
-    
     def __init__(self):
         self.config = yaml.load(open("src/settings.yaml", 'r', encoding='utf-8'), Loader=yaml.FullLoader)
         self.load()
