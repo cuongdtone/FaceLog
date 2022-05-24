@@ -4,7 +4,8 @@
 
 import os
 # import winsound # playsound
-
+import threading
+import time
 
 import cv2
 from PIL import Image, ImageDraw, ImageFont
@@ -55,9 +56,13 @@ class Main:
                                                      self.face_recognizer,
                                                      self.tddfa,
                                                      self.face_mask,
-                                                     self.employees_data)
+                                                     self.employees_data,
+                                                     self.search_tree)
         self.checkin_list = {}
         self.checkout_list = {}
+
+        reload = threading.Thread(target=self.reload, args=[])
+        reload.start()
         # print(self.employees_data)
         # observer = Observer()
         # handler = File_Events_Handler(self.load)
@@ -65,7 +70,14 @@ class Main:
         # observer.start()
 
     def load(self):
-        self.employees_data, self.employees_info = load_user_data()
+        self.employees_data, self.search_tree, self.employees_info = load_user_data()
+
+    def reload(self):
+        while True:
+            time.sleep(3)
+            self.load()
+            self.camera_detect.employees_data = self.employees_data
+            self.camera_detect.search_tree = self.search_tree
 
     def run(self):
         data_queue, frame_queue = self.camera_detect.run()

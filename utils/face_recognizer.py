@@ -10,6 +10,15 @@ from numpy.linalg import norm as l2norm
 from .face_aligner import norm_crop
 
 
+def face_compare_tree(feat, user_data, tree):
+    face_id = tree.get_nns_by_vector(feat, 1)
+    feat_db = tree.get_item_vector(face_id[0])
+    sim = np.dot(feat, feat_db) / (np.linalg.norm(feat) * np.linalg.norm(feat_db))
+    if sim>0.6:
+        return {'code': user_data[face_id, 0][0], 'fullname': user_data[face_id, 1][0], 'Sim': sim}
+    else:
+        return {'code': None, 'fullname': 'uknown', 'Sim': 0}
+
 class ArcFaceONNX:
     def __init__(self, model_file=None, session=None):
         assert model_file is not None

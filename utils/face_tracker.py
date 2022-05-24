@@ -2,6 +2,7 @@ from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np
 from .face_aligner import norm_crop
+from .face_recognizer import face_compare_tree
 import cv2
 
 
@@ -109,7 +110,7 @@ class Track():
 
 		# self.eye = Eye()
 
-	def update(self, id, box, kps, frame, face_recognizer, face_mask, employees_data, recog, rotation_face):
+	def update(self, id, box, kps, frame, face_recognizer, face_mask, employees_data, search_tree, recog, rotation_face):
 
 		if not id in self.people_tracked.keys():
 			self.people_tracked.update({id: {'box': box,
@@ -144,7 +145,8 @@ class Track():
 							aimg = norm_crop(frame, kps)
 							if face_mask.predict(aimg):
 								feet = face_recognizer.face_encoding(frame, kps)
-								info = face_recognizer.face_compare(feet, employees_data)
+								# info = face_recognizer.face_compare(feet, employees_data)
+								info = face_compare_tree(feet, employees_data, search_tree)
 								if info['Sim'] > self.verify_threshold:
 									print(info)
 									self.people_tracked[id]['verify'] = info
@@ -152,6 +154,8 @@ class Track():
 								print('Have mask')
 
 		return self.people_tracked[id]['verify']
+
+
 
 
 
