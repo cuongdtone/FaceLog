@@ -1,8 +1,6 @@
 # -*-encoding:utf-8-*-
 
 import os
-# import winsound # playsound
-
 import cv2
 import yaml
 from utils.face_detecter import RetinaFace
@@ -14,8 +12,9 @@ from utils.timekeeping import checkin # check_timekeep
 from utils.functions import Watcher
 from utils.face_thread import MultiCameraDetectThread
 
-class Main:
 
+class Main:
+    
     def __init__(self):
         self.config = yaml.load(open("src/settings.yaml", 'r', encoding='utf-8'), Loader=yaml.FullLoader)
         self.load()
@@ -23,7 +22,6 @@ class Main:
         self.face_recognizer = ArcFaceONNX(model_file='src/w600k_mbf.onnx')
         self.tddfa = TDDFA_ONNX(**(yaml.load(open('src/mb1_120x120.yml'), Loader=yaml.SafeLoader)))
         self.face_mask = MaskDetection(weight='src/model_mask.onnx')
-
         # Multi (1, 2, 3 ...) camera detecter backend
         camera_list = [self.config['id_camera_1'], self.config['id_camera_2']]
         self.list_camera_name = ['front', 'back']
